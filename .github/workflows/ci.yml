@@ -60,5 +60,5 @@ jobs:
       - run: mix compile --warnings-as-errors
         if: matrix.warnings_as_errors
       - run: mix test
-      - run: mix dialyzer --halt-exit-status
+      - run: mix dialyzer
         if: matrix.static_analysis
