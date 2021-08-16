@@ -224,12 +224,12 @@ defmodule Jason.Formatter do
   defp pp_string(binary, output_acc, false = _in_bs, cont) when is_binary(binary) do
     case :binary.match(binary, ["\"", "\\"]) do
       :nomatch ->
-        {[output_acc | binary], &pp_string(&1, &2, false, cont)}
+        {[output_acc | [binary]], &pp_string(&1, &2, false, cont)}
       {pos, 1} ->
         {head, tail} = :erlang.split_binary(binary, pos + 1)
         case :binary.at(binary, pos) do
-          ?\\ -> pp_string(tail, [output_acc | head], true, cont)
-          ?" -> cont.(tail, [output_acc | head])
+          ?\\ -> pp_string(tail, [output_acc | [head]], true, cont)
+          ?" -> cont.(tail, [output_acc | [head]])
         end
     end
   end

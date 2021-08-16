@@ -357,11 +357,11 @@ defmodule Jason.Decoder do
     bytecase data, 128 do
       _ in '"', rest ->
         last = binary_part(original, skip, len)
-        string = IO.iodata_to_binary([acc | last])
+        string = IO.iodata_to_binary([acc | [last]])
         continue(rest, original, skip + len + 1, stack, key_decode, string_decode, string)
       _ in '\\', rest ->
         part = binary_part(original, skip, len)
-        escape(rest, original, skip + len, stack, key_decode, string_decode, [acc | part])
+        escape(rest, original, skip + len, stack, key_decode, string_decode, [acc | [part]])
       _ in unquote(0x00..0x1F), _rest ->
         error(original, skip + len)
       _, rest ->
@@ -564,7 +564,7 @@ defmodule Jason.Decoder do
       acc =
         quote bind_quoted: [acc: acc, first: first, last: last, hi: hi] do
           lo = ((first &&& 0x03) <<< 8) + last
-          [acc | <<(hi + lo)::utf8>>]
+          [acc | [<<(hi + lo)::utf8>>]]
         end
       args = [rest, original, skip, stack, key_decode, string_decode, acc, 0]
       [clause] =

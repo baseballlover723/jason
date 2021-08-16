@@ -291,7 +291,7 @@ defmodule Jason.Encode do
     {byte, _escape} ->
       defp escape_json(<<byte, rest::bits>>, acc, original, skip)
            when byte === unquote(byte) do
-        acc = [acc | escape(byte)]
+        acc = [acc | [escape(byte)]]
         escape_json(rest, acc, original, skip + 1)
       end
   end)
@@ -323,7 +323,7 @@ defmodule Jason.Encode do
       defp escape_json_chunk(<<byte, rest::bits>>, acc, original, skip, len)
            when byte === unquote(byte) do
         part = binary_part(original, skip, len)
-        acc = [acc, part | escape(byte)]
+        acc = [acc, part | [escape(byte)]]
         escape_json(rest, acc, original, skip + len + 1)
       end
   end)
@@ -340,7 +340,7 @@ defmodule Jason.Encode do
   end
   defp escape_json_chunk(<<>>, acc, original, skip, len) do
     part = binary_part(original, skip, len)
-    [acc | part]
+    [acc | [part]]
   end
   defp escape_json_chunk(<<byte, _rest::bits>>, _acc, original, _skip, _len) do
     error({:invalid_byte, byte, original})
@@ -361,7 +361,7 @@ defmodule Jason.Encode do
     {byte, _escape} ->
       defp escape_javascript(<<byte, rest::bits>>, acc, original, skip)
             when byte === unquote(byte) do
-        acc = [acc | escape(byte)]
+        acc = [acc | [escape(byte)]]
         escape_javascript(rest, acc, original, skip + 1)
       end
   end)
@@ -371,7 +371,7 @@ defmodule Jason.Encode do
   end
   Enum.map(surogate_escapes, fn {byte, escape} ->
     defp escape_javascript(<<unquote(byte)::utf8, rest::bits>>, acc, original, skip) do
-      acc = [acc | unquote(escape)]
+      acc = [acc | [unquote(escape)]]
       escape_javascript(rest, acc, original, skip + 3)
     end
   end)
@@ -399,7 +399,7 @@ defmodule Jason.Encode do
       defp escape_javascript_chunk(<<byte, rest::bits>>, acc, original, skip, len)
             when byte === unquote(byte) do
         part = binary_part(original, skip, len)
-        acc = [acc, part | escape(byte)]
+        acc = [acc, part | [escape(byte)]]
         escape_javascript(rest, acc, original, skip + len + 1)
       end
   end)
@@ -410,7 +410,7 @@ defmodule Jason.Encode do
   Enum.map(surogate_escapes, fn {byte, escape} ->
     defp escape_javascript_chunk(<<unquote(byte)::utf8, rest::bits>>, acc, original, skip, len) do
       part = binary_part(original, skip, len)
-      acc = [acc, part | unquote(escape)]
+      acc = [acc, part | [unquote(escape)]]
       escape_javascript(rest, acc, original, skip + len + 3)
     end
   end)
@@ -423,7 +423,7 @@ defmodule Jason.Encode do
   end
   defp escape_javascript_chunk(<<>>, acc, original, skip, len) do
     part = binary_part(original, skip, len)
-    [acc | part]
+    [acc | [part]]
   end
   defp escape_javascript_chunk(<<byte, _rest::bits>>, _acc, original, _skip, _len) do
     error({:invalid_byte, byte, original})
@@ -446,7 +446,7 @@ defmodule Jason.Encode do
     {byte, _escape} ->
       defp escape_html(<<byte, rest::bits>>, acc, original, skip)
             when byte === unquote(byte) do
-        acc = [acc | escape(byte)]
+        acc = [acc | [escape(byte)]]
         escape_html(rest, acc, original, skip + 1)
       end
   end)
@@ -456,7 +456,7 @@ defmodule Jason.Encode do
   end
   Enum.map(surogate_escapes, fn {byte, escape} ->
     defp escape_html(<<unquote(byte)::utf8, rest::bits>>, acc, original, skip) do
-      acc = [acc | unquote(escape)]
+      acc = [acc | [unquote(escape)]]
       escape_html(rest, acc, original, skip + 3)
     end
   end)
@@ -484,7 +484,7 @@ defmodule Jason.Encode do
       defp escape_html_chunk(<<byte, rest::bits>>, acc, original, skip, len)
             when byte === unquote(byte) do
         part = binary_part(original, skip, len)
-        acc = [acc, part | escape(byte)]
+        acc = [acc, part | [escape(byte)]]
         escape_html(rest, acc, original, skip + len + 1)
       end
   end)
@@ -495,7 +495,7 @@ defmodule Jason.Encode do
   Enum.map(surogate_escapes, fn {byte, escape} ->
     defp escape_html_chunk(<<unquote(byte)::utf8, rest::bits>>, acc, original, skip, len) do
       part = binary_part(original, skip, len)
-      acc = [acc, part | unquote(escape)]
+      acc = [acc, part | [unquote(escape)]]
       escape_html(rest, acc, original, skip + len + 3)
     end
   end)
@@ -508,7 +508,7 @@ defmodule Jason.Encode do
   end
   defp escape_html_chunk(<<>>, acc, original, skip, len) do
     part = binary_part(original, skip, len)
-    [acc | part]
+    [acc | [part]]
   end
   defp escape_html_chunk(<<byte, _rest::bits>>, _acc, original, _skip, _len) do
     error({:invalid_byte, byte, original})
@@ -529,28 +529,28 @@ defmodule Jason.Encode do
     {byte, _escape} ->
       defp escape_unicode(<<byte, rest::bits>>, acc, original, skip)
            when byte === unquote(byte) do
-        acc = [acc | escape(byte)]
+        acc = [acc | [escape(byte)]]
         escape_unicode(rest, acc, original, skip + 1)
       end
   end)
   defp escape_unicode(<<char::utf8, rest::bits>>, acc, original, skip)
        when char <= 0xFF do
-    acc = [acc, "\\u00" | Integer.to_string(char, 16)]
+    acc = [acc, "\\u00" | [Integer.to_string(char, 16)]]
     escape_unicode(rest, acc, original, skip + 2)
   end
   defp escape_unicode(<<char::utf8, rest::bits>>, acc, original, skip)
         when char <= 0x7FF do
-    acc = [acc, "\\u0" | Integer.to_string(char, 16)]
+    acc = [acc, "\\u0" | [Integer.to_string(char, 16)]]
     escape_unicode(rest, acc, original, skip + 2)
   end
   defp escape_unicode(<<char::utf8, rest::bits>>, acc, original, skip)
         when char <= 0xFFF do
-    acc = [acc, "\\u0" | Integer.to_string(char, 16)]
+    acc = [acc, "\\u0" | [Integer.to_string(char, 16)]]
     escape_unicode(rest, acc, original, skip + 3)
   end
   defp escape_unicode(<<char::utf8, rest::bits>>, acc, original, skip)
         when char <= 0xFFFF do
-    acc = [acc, "\\u" | Integer.to_string(char, 16)]
+    acc = [acc, "\\u" | [Integer.to_string(char, 16)]]
     escape_unicode(rest, acc, original, skip + 3)
   end
   defp escape_unicode(<<char::utf8, rest::bits>>, acc, original, skip) do
@@ -559,8 +559,8 @@ defmodule Jason.Encode do
       [
         acc,
         "\\uD", Integer.to_string(0x800 ||| (char >>> 10), 16),
-        "\\uD" | Integer.to_string(0xC00 ||| (char &&& 0x3FF), 16)
-      ]
+        "\\uD" | [Integer.to_string(0xC00 ||| (char &&& 0x3FF), 16)
+      ]]
     escape_unicode(rest, acc, original, skip + 4)
   end
   defp escape_unicode(<<>>, acc, _original, _skip) do
@@ -580,32 +580,32 @@ defmodule Jason.Encode do
       defp escape_unicode_chunk(<<byte, rest::bits>>, acc, original, skip, len)
             when byte === unquote(byte) do
         part = binary_part(original, skip, len)
-        acc = [acc, part | escape(byte)]
+        acc = [acc, part | [escape(byte)]]
         escape_unicode(rest, acc, original, skip + len + 1)
       end
   end)
   defp escape_unicode_chunk(<<char::utf8, rest::bits>>, acc, original, skip, len)
        when char <= 0xFF do
     part = binary_part(original, skip, len)
-    acc = [acc, part, "\\u00" | Integer.to_string(char, 16)]
+    acc = [acc, part, "\\u00" | [Integer.to_string(char, 16)]]
     escape_unicode(rest, acc, original, skip + len + 2)
   end
   defp escape_unicode_chunk(<<char::utf8, rest::bits>>, acc, original, skip, len)
         when char <= 0x7FF do
     part = binary_part(original, skip, len)
-    acc = [acc, part, "\\u0" | Integer.to_string(char, 16)]
+    acc = [acc, part, "\\u0" | [Integer.to_string(char, 16)]]
     escape_unicode(rest, acc, original, skip + len + 2)
   end
   defp escape_unicode_chunk(<<char::utf8, rest::bits>>, acc, original, skip, len)
         when char <= 0xFFF do
     part = binary_part(original, skip, len)
-    acc = [acc, part, "\\u0" | Integer.to_string(char, 16)]
+    acc = [acc, part, "\\u0" | [Integer.to_string(char, 16)]]
     escape_unicode(rest, acc, original, skip + len + 3)
   end
   defp escape_unicode_chunk(<<char::utf8, rest::bits>>, acc, original, skip, len)
         when char <= 0xFFFF do
     part = binary_part(original, skip, len)
-    acc = [acc, part, "\\u" | Integer.to_string(char, 16)]
+    acc = [acc, part, "\\u" | [Integer.to_string(char, 16)]]
     escape_unicode(rest, acc, original, skip + len + 3)
   end
   defp escape_unicode_chunk(<<char::utf8, rest::bits>>, acc, original, skip, len) do
@@ -615,13 +615,13 @@ defmodule Jason.Encode do
       [
         acc, part,
         "\\uD", Integer.to_string(0x800 ||| (char >>> 10), 16),
-        "\\uD" | Integer.to_string(0xC00 ||| (char &&& 0x3FF), 16)
-      ]
+        "\\uD" | [Integer.to_string(0xC00 ||| (char &&& 0x3FF), 16)
+      ]]
     escape_unicode(rest, acc, original, skip + len + 4)
   end
   defp escape_unicode_chunk(<<>>, acc, original, skip, len) do
     part = binary_part(original, skip, len)
-    [acc | part]
+    [acc | [part]]
   end
   defp escape_unicode_chunk(<<byte, _rest::bits>>, _acc, original, _skip, _len) do
     error({:invalid_byte, byte, original})
